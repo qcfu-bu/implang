@@ -340,8 +340,8 @@ Value *ExprCompile::operator()(FuncExpr &fexpr) {
       builder.getInt64(module.getDataLayout().getTypeAllocSize(data_t));
   DataLayout layout = module.getDataLayout();
   IntegerType *inptr_t = layout.getIntPtrType(context);
-  Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, allocator,
-                                     nullptr, "data");
+  Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, nullptr,
+                                     allocator, "data");
   for (unsigned i = 0; i < fv_id.size(); i++) {
     Value *ptr = builder.CreateStructGEP(data_t, data, i);
     Value *val = find_id(fv_id[i], table);
@@ -500,8 +500,8 @@ void CmdCompile::operator()(FuncCmd &cmd) {
       builder.getInt64(module.getDataLayout().getTypeAllocSize(data_t));
   DataLayout layout = module.getDataLayout();
   IntegerType *inptr_t = layout.getIntPtrType(context);
-  Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, allocator,
-                                     nullptr, "data");
+  Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, nullptr,
+                                     allocator, "data");
   for (unsigned i = 0; i < fv_id.size(); i++) {
     Value *ptr = builder.CreateStructGEP(data_t, data, i);
     Value *val = find_id(fv_id[i], table);
