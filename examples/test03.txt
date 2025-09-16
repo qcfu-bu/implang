@@ -1,0 +1,17 @@
+extern func print_int(x: int): void;
+
+var x: bool = true;
+var x: int;
+var x: int;
+
+func main() {
+    x = 123;
+    const f1 = func() { return 1; };
+    const f2 = func() { return 2; };
+    const f3 = func() { return 3; };
+    const f4 = func() { return 4; };
+    print_int(f1());
+    print_int(f2());
+    print_int(f3());
+    print_int(f4());
+}

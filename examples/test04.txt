@@ -1,0 +1,24 @@
+extern func print_int(x: int): void;
+
+var x = 0;
+
+func foo(y: int) {
+    func inner() {
+        func loop() {
+            print_int(x);
+            if (x >= y) {
+                return;
+            }
+            x = x + 1;
+            loop();
+        }
+        loop();
+    }
+    return inner;
+}
+
+func main() {
+    const foo = foo(10); 
+    foo();
+    foo();
+}

@@ -1,0 +1,11 @@
+extern func print_int(x: int): void;
+
+var tup = (1, (2, 3)); 
+
+func main() {
+    tup.0 = 4 + tup.0;
+
+    print_int(tup.0);
+    print_int(tup.1.0);
+    print_int(tup.1.1);
+}

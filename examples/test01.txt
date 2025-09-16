@@ -1,0 +1,40 @@
+
+/* 
+
+struct closure {
+    (B(closure, A))* func_ptr;
+    data*            data_ptr;
+}
+
+B call(closure clo, A arg) {
+    data* data_ptr = clo.data_ptr;
+    (B(data*, A))* func_ptr = clo.func_ptr;
+    return (*func_ptr)(closure, arg);
+} 
+
+B foo(closure clo, A arg) {
+    data1 d1 = clo.data->d1;  
+    data1 d2 = clo.data->d2;  
+    ...
+    return call(clo, arg);
+}
+
+*/
+
+extern func print_int(x: int): void;
+
+func foo(x: int) {
+    return x + 1;
+}
+
+func bar(f: (int -> int) -> int): () -> int {
+    return func() { return f(foo); };
+}
+
+func baz(f: int -> int): int {
+    return f(10); 
+}
+
+func main() {
+    print_int(bar(baz)());
+}

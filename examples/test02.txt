@@ -1,0 +1,24 @@
+extern func print_int(x: int): void;
+
+func kfact(x: int, k: int -> int): int {
+    if (x <= 1) {
+        return k(1);
+    }
+    return kfact(x - 1, func(res) {
+        return k(x * res);
+    });
+}
+
+func foo(x: int, f: int -> int) {
+    func loop(i: int) {
+        if (i <= x) {
+            print_int(f(i));
+            loop(i + 1);
+        } 
+    } 
+    loop(0);
+} 
+
+func main() {
+    foo(10, func(x) { return kfact(x, func(x) { return x; }); });
+}
