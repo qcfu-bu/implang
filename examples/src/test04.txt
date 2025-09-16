@@ -18,7 +18,7 @@ func foo(y: int) {
 }
 
 func main() {
-    const foo = foo(10); 
+    let foo = foo(10); 
     foo();
     foo();
 }
