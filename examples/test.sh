@@ -1,5 +1,6 @@
-for filename in "examples"/*.txt; do
-    basename="${filename%.*}"
-    ./implang -i "$filename" -o "$basename.o"
-    clang "$basename.o" "runtime/runtime.o" -o "$basename.exe"
+clang++ -c examples/runtime/runtime.cpp -o examples/obj/runtime.o
+for filename in "examples/src"/*.txt; do
+    name=$(basename "$filename" .txt)
+    ./implang -i "$filename" -o "examples/obj/$name.o"
+    clang++ "examples/obj/$name.o" "examples/obj/runtime.o" -o "examples/bin/$name.exe"
 done
