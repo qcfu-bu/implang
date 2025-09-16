@@ -6,7 +6,8 @@ Implang is a simple toy language for the purpose of learning LLVM.
 Implang only depends on LLVM (known to work with 21.1.1) and a C/C++ compiler.
 
 ```
-cmake .
+mkdir build && cd build
+cmake ..
 make
 ```
 
