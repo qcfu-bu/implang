@@ -34,6 +34,7 @@ struct CodeGen {
   LLVMContext context;
   Module module;
   IRBuilder<> builder;
+  Function *allocator;
   SymbolTable table;
   BasicBlock *global_bb;
 

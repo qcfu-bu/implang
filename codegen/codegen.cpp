@@ -35,11 +35,13 @@ struct Compile {
   LLVMContext &context;
   Module &module;
   IRBuilder<> &builder;
+  Function *allocator;
   SymbolTable &table;
 
   Compile(CodeGen *codegen)
       : codegen{codegen}, context(codegen->context), module(codegen->module),
-        builder(codegen->builder), table(codegen->table) {}
+        builder(codegen->builder), table(codegen->table),
+        allocator(codegen->allocator) {}
 };
 
 struct ClosureType {
@@ -338,7 +340,7 @@ Value *ExprCompile::operator()(FuncExpr &fexpr) {
       builder.getInt64(module.getDataLayout().getTypeAllocSize(data_t));
   DataLayout layout = module.getDataLayout();
   IntegerType *inptr_t = layout.getIntPtrType(context);
-  Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, nullptr,
+  Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, allocator,
                                      nullptr, "data");
   for (unsigned i = 0; i < fv_id.size(); i++) {
     Value *ptr = builder.CreateStructGEP(data_t, data, i);
@@ -498,7 +500,7 @@ void CmdCompile::operator()(FuncCmd &cmd) {
       builder.getInt64(module.getDataLayout().getTypeAllocSize(data_t));
   DataLayout layout = module.getDataLayout();
   IntegerType *inptr_t = layout.getIntPtrType(context);
-  Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, nullptr,
+  Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, allocator,
                                      nullptr, "data");
   for (unsigned i = 0; i < fv_id.size(); i++) {
     Value *ptr = builder.CreateStructGEP(data_t, data, i);
@@ -786,6 +788,12 @@ CodeGen::CodeGen(const std::string &module_name, int opt_level, Prog &prog)
                        Function::InternalLinkage, "global_init", module);
   global_bb = BasicBlock::Create(context, "entry", global_init);
   llvm::appendToGlobalCtors(module, global_init, 0);
+
+  // declare GC_malloc
+  allocator = Function::Create(
+      FunctionType::get(PointerType::get(context, 0),
+                        {IntegerType::get(context, 64)}, false),
+      Function::ExternalLinkage, "GC_malloc", module);
 
   // initialize all targets
   InitializeAllTargetInfos();
