@@ -62,3 +62,4 @@ CMakeUserPresets.json
 
 examples/*.o
 build
+.cache
