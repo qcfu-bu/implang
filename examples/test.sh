@@ -1,4 +1,4 @@
-clang++ -c examples/runtime/runtime.cpp -o examples/obj/runtime.o
+clang -c examples/runtime/runtime.c -o examples/obj/runtime.o
 for filename in "examples/src"/*.txt; do
     echo "compiling $filename"
     name=$(basename "$filename" .txt)
