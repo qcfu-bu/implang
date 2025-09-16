@@ -190,8 +190,8 @@ Token Lexer::next_token() {
       return TRUE;
     if (str == "false")
       return FALSE;
-    if (str == "const")
-      return CONST;
+    if (str == "let")
+      return LET;
     if (str == "var")
       return VAR;
     if (str == "if")

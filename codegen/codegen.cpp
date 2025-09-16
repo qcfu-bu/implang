@@ -1,6 +1,5 @@
 #include "codegen.h"
 #include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/Constants.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/DerivedTypes.h"
 #include "llvm/IR/Function.h"
@@ -90,7 +89,7 @@ struct CmdCompile : public Compile {
 
   AllocaInst *alloc_var(Id &id);
   void operator()(Expr &expr);
-  void operator()(ConstCmd &cmd);
+  void operator()(LetCmd &cmd);
   void operator()(VarCmd &cmd);
   void operator()(FuncCmd &cmd);
   void operator()(BlockCmd &cmd);
@@ -107,7 +106,7 @@ struct DeclCompile : public Compile {
 
   void operator()(ExternDecl &decl);
   void operator()(FuncDecl &decl);
-  void operator()(ConstDecl &decl);
+  void operator()(LetDecl &decl);
   void operator()(VarDecl &decl);
 };
 
@@ -182,8 +181,7 @@ Value *ExprCompile::get_lvalue(Expr *lhs) {
 
   // indexing location
   while (auto *prj = std::get_if<PrjExpr>(lhs)) {
-    idx_list.push_back(
-        ConstantInt::get(llvm::Type::getInt32Ty(context), prj->prj));
+    idx_list.push_back(builder.getInt32(prj->prj));
     lhs = prj->rhs.get();
   }
 
@@ -268,7 +266,7 @@ Value *ExprCompile::operator()(BinaryOpExpr &bop) {
       return builder.CreateICmpEQ(lhs, rhs, "eqtmp");
     }
     if (auto *tu = std::get_if<TupleType>(&lhs_t)) {
-      Value *prj_eq = ConstantInt::get(llvm::Type::getInt1Ty(context), 1);
+      Value *prj_eq = builder.getInt1(true);
       for (unsigned i = 0; i < tu->prj_t.size(); i++) {
         Value *l_prj = builder.CreateExtractValue(lhs, {i}, "lprjtmp");
         Value *r_prj = builder.CreateExtractValue(rhs, {i}, "rprjtmp");
@@ -285,7 +283,7 @@ Value *ExprCompile::operator()(BinaryOpExpr &bop) {
       return builder.CreateICmpNE(lhs, rhs, "netmp");
     }
     if (auto *tu = std::get_if<TupleType>(&lhs_t)) {
-      Value *prj_ne = ConstantInt::get(llvm::Type::getInt1Ty(context), 0);
+      Value *prj_ne = builder.getInt1(false);
       for (unsigned i = 0; i < tu->prj_t.size(); i++) {
         Value *l_prj = builder.CreateExtractValue(lhs, {i}, "lprjtmp");
         Value *r_prj = builder.CreateExtractValue(rhs, {i}, "rprjtmp");
@@ -337,8 +335,7 @@ Value *ExprCompile::operator()(FuncExpr &fexpr) {
   // create closure data
   llvm::Type *data_t = llvm::StructType::get(context, fv_ts);
   Value *data_size =
-      ConstantInt::get(llvm::Type::getInt64Ty(context),
-                       module.getDataLayout().getTypeAllocSize(data_t));
+      builder.getInt64(module.getDataLayout().getTypeAllocSize(data_t));
   DataLayout layout = module.getDataLayout();
   IntegerType *inptr_t = layout.getIntPtrType(context);
   Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, nullptr,
@@ -449,7 +446,7 @@ void CmdCompile::operator()(Expr &expr) {
   std::visit(ExprCompile{codegen}, expr);
 }
 
-void CmdCompile::operator()(ConstCmd &cmd) {
+void CmdCompile::operator()(LetCmd &cmd) {
   llvm::Type *t = TypeCompile::get(context, cmd.id.type);
   Value *init = std::visit(ExprCompile{codegen}, cmd.expr);
   table.back().emplace(cmd.id, init);
@@ -498,8 +495,7 @@ void CmdCompile::operator()(FuncCmd &cmd) {
   // create closure data
   llvm::Type *data_t = llvm::StructType::get(context, fv_ts);
   Value *data_size =
-      ConstantInt::get(llvm::Type::getInt64Ty(context),
-                       module.getDataLayout().getTypeAllocSize(data_t));
+      builder.getInt64(module.getDataLayout().getTypeAllocSize(data_t));
   DataLayout layout = module.getDataLayout();
   IntegerType *inptr_t = layout.getIntPtrType(context);
   Value *data = builder.CreateMalloc(inptr_t, data_t, data_size, nullptr,
@@ -756,7 +752,7 @@ void DeclCompile::operator()(FuncDecl &decl) {
   verifyFunction(*func);
 }
 
-void DeclCompile::operator()(ConstDecl &decl) {
+void DeclCompile::operator()(LetDecl &decl) {
   llvm::Type *t = TypeCompile::get(context, decl.id.type);
   GlobalVariable *global = module.getOrInsertGlobal(to_string(decl.id), t);
   global->setLinkage(llvm::GlobalValue::InternalLinkage);

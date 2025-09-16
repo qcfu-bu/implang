@@ -58,7 +58,7 @@ struct AppExpr;
 struct TupleExpr;
 struct PrjExpr;
 
-struct ConstCmd;
+struct LetCmd;
 struct VarCmd;
 struct FuncCmd;
 struct BlockCmd;
@@ -71,7 +71,7 @@ struct ReturnCmd;
 
 struct ExternDecl;
 struct FuncDecl;
-struct ConstDecl;
+struct LetDecl;
 struct VarDecl;
 
 struct Prog;
@@ -79,9 +79,9 @@ struct Prog;
 using Type = std::variant<ScalarType, FuncType, TupleType, Meta>;
 using Expr = std::variant<bool, int, Id, UnaryOpExpr, BinaryOpExpr, FuncExpr,
                           AppExpr, TupleExpr, PrjExpr>;
-using Cmd = std::variant<Expr, ConstCmd, VarCmd, FuncCmd, BlockCmd, IteCmd,
+using Cmd = std::variant<Expr, LetCmd, VarCmd, FuncCmd, BlockCmd, IteCmd,
                          ForCmd, WhileCmd, ContinueCmd, BreakCmd, ReturnCmd>;
-using Decl = std::variant<ExternDecl, FuncDecl, ConstDecl, VarDecl>;
+using Decl = std::variant<ExternDecl, FuncDecl, LetDecl, VarDecl>;
 
 std::string to_string(Type &t);
 std::string to_string(Id &id);
@@ -196,7 +196,7 @@ struct AppExpr {
 /******************************************************************************/
 // Commands
 
-struct ConstCmd {
+struct LetCmd {
   Id id;
   Expr expr;
 };
@@ -255,7 +255,7 @@ struct FuncDecl {
   std::vector<Cmd> body;
 };
 
-struct ConstDecl {
+struct LetDecl {
   Id id;
   Expr expr;
 };

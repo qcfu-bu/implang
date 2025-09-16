@@ -49,7 +49,7 @@ enum Token {
   // keywords
   TRUE,
   FALSE,
-  CONST,
+  LET,
   VAR,
   IF,
   ELSE,
@@ -166,7 +166,7 @@ private:
   Expr parse_BinaryOpExpr5(); // ||
   Expr parse_BinaryOpExpr6(); // =
 
-  Cmd parse_ConstCmd();
+  Cmd parse_LetCmd();
   Cmd parse_VarCmd();
   Cmd parse_FuncCmd();
   Cmd parse_BlockCmd();
@@ -179,7 +179,7 @@ private:
 
   Decl parse_ExternDecl();
   Decl parse_FuncDecl();
-  Decl parse_ConstDecl();
+  Decl parse_LetDecl();
   Decl parse_VarDecl();
 };
 

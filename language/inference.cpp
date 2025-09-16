@@ -339,7 +339,7 @@ Type ExprInfer::operator()(PrjExpr &prj) {
 
 struct CmdInfer {
   std::optional<Type> operator()(Expr &expr);
-  std::optional<Type> operator()(ConstCmd &cmd);
+  std::optional<Type> operator()(LetCmd &cmd);
   std::optional<Type> operator()(VarCmd &cmd);
   std::optional<Type> operator()(FuncCmd &cmd);
   std::optional<Type> operator()(BlockCmd &cmd);
@@ -358,7 +358,7 @@ std::optional<Type> CmdInfer::operator()(Expr &expr) {
   return std::nullopt;
 }
 
-std::optional<Type> CmdInfer::operator()(ConstCmd &cmd) {
+std::optional<Type> CmdInfer::operator()(LetCmd &cmd) {
   Type expr_t = infer_type(cmd.expr);
   if (!type_unify(cmd.id.type, expr_t)) {
     throw TypeException("type error: mismatched types in const declaration");
@@ -467,7 +467,7 @@ std::optional<Type> CmdInfer::operator()(ReturnCmd &cmd) {
 struct DeclInfer {
   void operator()(ExternDecl &decl) {};
   void operator()(FuncDecl &decl);
-  void operator()(ConstDecl &decl);
+  void operator()(LetDecl &decl);
   void operator()(VarDecl &decl);
 };
 
@@ -495,7 +495,7 @@ void DeclInfer::operator()(FuncDecl &decl) {
   }
 }
 
-void DeclInfer::operator()(ConstDecl &decl) {
+void DeclInfer::operator()(LetDecl &decl) {
   Type expr_t = infer_type(decl.expr);
   if (!type_unify(decl.id.type, expr_t)) {
     throw TypeException("type error: mismatched types in const declaration");

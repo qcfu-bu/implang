@@ -29,7 +29,7 @@ public:
   CmdFVars(std::set<Id> &bound) : bound(bound) {}
 
   std::set<Id> operator()(Expr &expr);
-  std::set<Id> operator()(ConstCmd &cmd);
+  std::set<Id> operator()(LetCmd &cmd);
   std::set<Id> operator()(VarCmd &cmd);
   std::set<Id> operator()(FuncCmd &cmd);
   std::set<Id> operator()(BlockCmd &cmd);
@@ -109,7 +109,7 @@ std::set<Id> CmdFVars::operator()(Expr &expr) {
   return std::visit(ExprFVars(bound), expr);
 }
 
-std::set<Id> CmdFVars::operator()(ConstCmd &cmd) {
+std::set<Id> CmdFVars::operator()(LetCmd &cmd) {
   bound.insert(cmd.id);
   auto fv = std::visit(ExprFVars(bound), cmd.expr);
   return fv;

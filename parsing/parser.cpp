@@ -338,8 +338,8 @@ Expr Parser::parse_BinaryOpExpr6() {
 /******************************************************************************/
 // Commands
 
-Cmd Parser::parse_ConstCmd() {
-  expect_token(lexer::CONST);
+Cmd Parser::parse_LetCmd() {
+  expect_token(lexer::LET);
   expect_token(lexer::IDENTIFIER);
   std::string s = lexer.identifier();
   Id id{s, false};
@@ -353,7 +353,7 @@ Cmd Parser::parse_ConstCmd() {
 
   scope.back().insert_or_assign(s, id);
 
-  return ConstCmd{id, std::move(expr)};
+  return LetCmd{id, std::move(expr)};
 }
 
 Cmd Parser::parse_VarCmd() {
@@ -524,8 +524,8 @@ Cmd Parser::parse_ReturnCmd() {
 Cmd Parser::parse_Cmd() {
   auto tok = lexer.peek_token();
   switch (tok) {
-  case lexer::CONST:
-    return parse_ConstCmd();
+  case lexer::LET:
+    return parse_LetCmd();
   case lexer::VAR:
     return parse_VarCmd();
   case lexer::FUNC:
@@ -657,8 +657,8 @@ Decl Parser::parse_FuncDecl() {
   return FuncDecl{id, std::move(params), std::move(cmds)};
 }
 
-Decl Parser::parse_ConstDecl() {
-  expect_token(lexer::CONST);
+Decl Parser::parse_LetDecl() {
+  expect_token(lexer::LET);
   expect_token(lexer::IDENTIFIER);
   std::string s = lexer.identifier();
   Id id{s, false};
@@ -670,7 +670,7 @@ Decl Parser::parse_ConstDecl() {
   auto expr = parse_Expr();
   expect_token(lexer::SEMI);
   scope.back().insert_or_assign(s, id);
-  return ConstDecl{id, std::move(expr)};
+  return LetDecl{id, std::move(expr)};
 }
 
 Decl Parser::parse_VarDecl() {
@@ -699,8 +699,8 @@ Decl Parser::parse_Decl() {
     return parse_ExternDecl();
   case lexer::FUNC:
     return parse_FuncDecl();
-  case lexer::CONST:
-    return parse_ConstDecl();
+  case lexer::LET:
+    return parse_LetDecl();
   case lexer::VAR:
     return parse_VarDecl();
   default: {

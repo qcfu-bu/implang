@@ -181,7 +181,7 @@ std::string ExprFmt::operator()(PrjExpr &prj) {
 
 struct CmdFmt {
   std::string operator()(Expr &expr);
-  std::string operator()(ConstCmd &cmd);
+  std::string operator()(LetCmd &cmd);
   std::string operator()(VarCmd &cmd);
   std::string operator()(FuncCmd &cmd);
   std::string operator()(BlockCmd &cmd);
@@ -197,11 +197,11 @@ std::string to_string(Cmd &cmd) { return std::visit(CmdFmt(), cmd); }
 
 std::string CmdFmt::operator()(Expr &expr) { return to_string(expr) + ";"; }
 
-std::string CmdFmt::operator()(ConstCmd &cmd) {
+std::string CmdFmt::operator()(LetCmd &cmd) {
   std::string id = to_string(cmd.id);
   std::string type = to_string(cmd.id.type);
   std::string expr = to_string(cmd.expr);
-  return "const " + id + ": " + type + " = " + expr + ";";
+  return "let " + id + ": " + type + " = " + expr + ";";
 }
 
 std::string CmdFmt::operator()(VarCmd &cmd) {
@@ -272,7 +272,7 @@ std::string CmdFmt::operator()(ReturnCmd &cmd) {
 struct DeclFmt {
   std::string operator()(ExternDecl &func);
   std::string operator()(FuncDecl &func);
-  std::string operator()(ConstDecl &cst);
+  std::string operator()(LetDecl &cst);
   std::string operator()(VarDecl &var);
 };
 
@@ -306,11 +306,11 @@ std::string DeclFmt::operator()(FuncDecl &func) {
   return "func " + id + "(" + args + "): " + out_t + " {\n" + body + "}";
 }
 
-std::string DeclFmt::operator()(ConstDecl &cst) {
+std::string DeclFmt::operator()(LetDecl &cst) {
   std::string id = to_string(cst.id);
   std::string type = to_string(cst.id.type);
   std::string expr = to_string(cst.expr);
-  return "const " + id + ": " + type + " = " + expr + ";";
+  return "let " + id + ": " + type + " = " + expr + ";";
 }
 
 std::string DeclFmt::operator()(VarDecl &var) {
