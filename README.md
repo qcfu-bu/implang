@@ -1,6 +1,31 @@
-# Toy Imperative Language
+# Implang
 
 Implang is a simple toy language for the purpose of learning LLVM.
+
+## Building
+Implang only depends on LLVM (known to work with 21.1.1) and a C/C++ compiler.
+
+```
+cmake .
+make
+```
+
+## Usage
+```
+./implang -i <input> -o <output> [optimization]
+```
+
+Optimization level
+- `-O0` No optimization
+- `-O1` Less optimization
+- `-O2` Default optimization
+- `-O3` Aggressive optimization
+
+Example Implang programs are at [`examples`](examples). Compile and link all examples using:
+```
+./examples/test.sh
+```
+Binaries will be saved to [`examples/bin`](examples/bin/).
 
 ## Language Features
 ### Types
@@ -64,6 +89,6 @@ break;      // break from loop
 ```
 
 ### Semantics
-- Call by value
-- Pass by value
-- Closure capture by value
+- Call by value.
+- Pass by value.
+- Closure capture by value.
